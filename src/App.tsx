@@ -1,24 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import axios from "axios";
 import './App.css';
 
+const API_URL = 'https://aapb8bse0c.execute-api.us-east-1.amazonaws.com/prod/words-types';
+
 function App() {
+  const [inputData, setInputData] = useState('');
+  const [result, setResult] = useState('');
+
+  const inputHandler = (e: any) => {
+      setInputData(e.target.value);
+  };
+
+  const submitHandler = async () => {
+      try {
+          const response = await axios.post(API_URL, { text: inputData}, { headers: { "Content-Type": "application/json"}});
+          let formattedString = '';
+          for (const key in response.data) {
+              formattedString += `${key}: ${response.data[key]}\n`;
+          }
+          setResult(formattedString);
+      } catch (err) {
+          console.log(err);
+      }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <h1>Input text</h1>
+        <textarea onChange={inputHandler}></textarea>
+        <h1>Results</h1>
+        <textarea value={result} disabled={true}></textarea>
+        <button onClick={submitHandler} className="button-27">Submit</button>
     </div>
   );
 }
