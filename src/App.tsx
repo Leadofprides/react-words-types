@@ -7,21 +7,25 @@ const API_URL = 'https://aapb8bse0c.execute-api.us-east-1.amazonaws.com/prod/wor
 function App() {
   const [inputData, setInputData] = useState('');
   const [result, setResult] = useState('');
+  const [cache, setCache] = useState('');
 
   const inputHandler = (e: any) => {
       setInputData(e.target.value);
   };
 
   const submitHandler = async () => {
-      try {
-          const response = await axios.post(API_URL, { text: inputData}, { headers: { "Content-Type": "application/json"}});
-          let formattedString = '';
-          for (const key in response.data) {
-              formattedString += `${key}: ${response.data[key]}\n`;
+      if (inputData !== cache) {
+          setCache(inputData);
+          try {
+              const response = await axios.post(API_URL, {text: inputData}, {headers: {"Content-Type": "application/json"}});
+              let formattedString = '';
+              for (const key in response.data) {
+                  formattedString += `${key}: ${response.data[key]}\n`;
+              }
+              setResult(formattedString);
+          } catch (err) {
+              console.log(err);
           }
-          setResult(formattedString);
-      } catch (err) {
-          console.log(err);
       }
   };
 
